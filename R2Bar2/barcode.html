@@ -1,0 +1,131 @@
+<html>
+<head>
+    <title>R2Bar2</title>
+    <style type="text/css">
+        body {
+            font-size: 2em;
+        }
+    </style>
+    <script type="text/javascript">
+    var idStart = [ // 6 bars of narrow width
+        0, 0, 0, 0, 0, 0
+    ];
+    var idEnd = [ // 2 narrow bars, 1 wide bar, 2 narrow bars
+        0, 0, 1, 0, 0
+    ];
+    var idDigits = [
+        [ 0, 0, 0, 1, 1 ],
+        [ 0, 0, 1, 0, 1 ],
+        [ 0, 0, 1, 1, 0 ],
+        [ 0, 1, 0, 0, 1 ],
+        [ 0, 1, 0, 1, 0 ],
+        [ 0, 1, 1, 0, 0 ],
+        [ 1, 0, 0, 0, 1 ],
+        [ 1, 0, 0, 1, 0 ],
+        [ 1, 0, 1, 0, 0 ],
+        [ 1, 1, 0, 0, 0 ]
+    ];
+    
+    window.addEventListener("load", function() {
+        document.getElementById("asdf").addEventListener("keyup", draw);
+    });
+    
+    function draw() {
+        var options = {
+            "w": 10,
+            "h": 100,
+            "v": 0
+        };
+        
+        // Parse arguments
+        var args = document.getElementById("asdf").value.split(",");
+        for (var i = 0; i < args.length; i++) {
+            var s = args[i];
+            var j = s.indexOf("=");
+            if (j >= 0) {
+                try {
+                    options[s.substring(0, j).trim()] = parseInt(s.substring(j+1).trim());
+                }
+                catch (e) {
+                }
+            }
+        }
+        
+        // Prepare
+        var values = options["v"].toString().split("").map(function (c) { return parseInt(c); });
+        var perwidth = options["w"];
+        var width = options["w"] * (6 + 7 * values.length + 6);
+        var height = options["h"];
+        var canvas = document.getElementById("can");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+        
+        // Write
+        var ctx = canvas.getContext("2d");
+        var index = 0;
+        var color = 0;
+        // Start
+        for (var i = 0; i < idStart.length; i++) {
+            if (color % 2 == 0) {
+                ctx.fillStyle = "black";
+            }
+            else {
+                ctx.fillStyle = "white";
+            }
+            
+            ctx.fillRect(index * perwidth, 0, (idStart[i] + 1) * perwidth, height);
+            index += idStart[i] + 1;
+            
+            color++;
+        }
+        
+        // Value
+        try {
+            for (var j = 0; j < values.length; j++) {
+                var d = idDigits[values[j]];
+                for (var i = 0; i < d.length; i++) {
+                    if (color % 2 == 0) {
+                        ctx.fillStyle = "black";
+                    }
+                    else {
+                        ctx.fillStyle = "white";
+                    }
+                    
+                    ctx.fillRect(index * perwidth, 0, (d[i] + 1) * perwidth, height);
+                    index += d[i] + 1;
+                    
+                    color++;
+                }
+            }
+        }
+        catch (e) {
+        }
+        
+        // End
+        for (var i = 0; i < idEnd.length; i++) {
+            if (color % 2 == 0) {
+                ctx.fillStyle = "black";
+            }
+            else {
+                ctx.fillStyle = "white";
+            }
+            
+            ctx.fillRect(index * perwidth, 0, (idEnd[i] + 1) * perwidth, height);
+            index += idEnd[i] + 1;
+            
+            color++;
+        }
+    }
+    </script>
+</head>
+<body>
+    Default: w=10, h=100, v=0
+    <br />
+    <input type="text" id="asdf" />
+    <br />
+    <br />
+    <canvas width="100" height="100" id="can"></canvas>
+</body>
+</html>

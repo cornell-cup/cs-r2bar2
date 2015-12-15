@@ -1,0 +1,118 @@
+<html>
+<head>
+    <title>R2Bar2</title>
+    <style type="text/css">
+        body {
+            font-size: 2em;
+        }
+    </style>
+    <script type="text/javascript">
+    var idStart = [ // 6 bars of narrow width
+        0, 0, 0, 0, 0, 0
+    ];
+    var idEnd = [ // 2 narrow bars, 1 wide bar, 2 narrow bars
+        0, 0, 1, 0, 0
+    ];
+    var idDigits = [
+        [ 0, 0, 0, 1, 1 ],
+        [ 0, 0, 1, 0, 1 ],
+        [ 0, 0, 1, 1, 0 ],
+        [ 0, 1, 0, 0, 1 ],
+        [ 0, 1, 0, 1, 0 ],
+        [ 0, 1, 1, 0, 0 ],
+        [ 1, 0, 0, 0, 1 ],
+        [ 1, 0, 0, 1, 0 ],
+        [ 1, 0, 1, 0, 0 ],
+        [ 1, 1, 0, 0, 0 ]
+    ];
+    
+    window.addEventListener("load", function() {
+        draw();
+    });
+    
+    function draw() {
+        var options = {
+            "w": 20,
+            "h": 4,
+            "v": 0
+        };
+        
+        for (var cn = 0; cn < 200; cn++) {
+            // Prepare
+            // Number ladder - only change one digit
+            var d1 = cn % 10;
+            var d2 = ~~(cn/10) % 10;
+            var d3 = ~~(cn/100) % 10;
+            
+            var values = [ 1, d3, (d3 % 2 == 0) ? d2 : (9 - d2), (d2 % 2 == 0) ? d1 : (9 - d1) ];
+            //var values = [ 0, 2, 2 ];
+            //console.log(d3 + "" + d2 + "" + d1 + "  " + values.join(""));
+            var perwidth = options["w"];
+            var width = perwidth * (6 + 7 * values.length + 6);
+            var height = options["h"];
+            var y = (cn) * height;
+            var canvas = document.getElementById("can");
+            
+            // Write
+            var ctx = canvas.getContext("2d");
+            var index = 0;
+            var color = 0;
+            // Start
+            for (var i = 0; i < idStart.length; i++) {
+                if (color % 2 == 0) {
+                    ctx.fillStyle = "black";
+                }
+                else {
+                    ctx.fillStyle = "white";
+                }
+                
+                ctx.fillRect(y, index * perwidth, height, (idStart[i] + 1) * perwidth);
+                index += idStart[i] + 1;
+                
+                color++;
+            }
+            
+            // Value
+            try {
+                for (var j = 0; j < values.length; j++) {
+                    var d = idDigits[values[j]];
+                    for (var i = 0; i < d.length; i++) {
+                        if (color % 2 == 0) {
+                            ctx.fillStyle = "black";
+                        }
+                        else {
+                            ctx.fillStyle = "white";
+                        }
+                        
+                        ctx.fillRect(y, index * perwidth, height, (d[i] + 1) * perwidth);
+                        index += d[i] + 1;
+                        
+                        color++;
+                    }
+                }
+            }
+            catch (e) {
+            }
+            
+            // End
+            for (var i = 0; i < idEnd.length; i++) {
+                if (color % 2 == 0) {
+                    ctx.fillStyle = "black";
+                }
+                else {
+                    ctx.fillStyle = "white";
+                }
+                
+                ctx.fillRect(y, index * perwidth, height, (idEnd[i] + 1) * perwidth);
+                index += idEnd[i] + 1;
+                
+                color++;
+            }
+        }
+    }
+    </script>
+</head>
+<body>
+    <canvas width="800" height="800" id="can"></canvas>
+</body>
+</html>
